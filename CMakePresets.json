@@ -5,12 +5,19 @@
 {
   "name": "default",
   "binaryDir": "build",
+  "installDir": "${fileDir}/build/local",
   "cacheVariables": {
     "h5fortran_warning_as_error": true,
     "h5fortran_BUILD_TESTING": true,
-    "h5fortran_find": true,
     "h5fortran_python": true,
     "CMAKE_BUILD_TYPE": "Release"
+  }
+},
+{ "name": "build", "inherits": "default",
+  "displayName": "Build HDF5 and ZLib from source with h5fortran",
+  "cacheVariables": {
+    "h5fortran_BUILD_TESTING": false,
+    "FETCHCONTENT_TRY_FIND_PACKAGE_MODE": "NEVER"
   }
 },
 { "name": "debug", "inherits": "default",
@@ -22,7 +29,7 @@
 {
   "name": "reldebug", "inherits": "default",
   "binaryDir": "build",
-  "displayName": "release with debug info",
+  "displayName": "Release with Debug Info",
   "cacheVariables": {
     "CMAKE_BUILD_TYPE": "RelWithDebInfo"
   }
@@ -33,15 +40,7 @@
   "cacheVariables": {
     "BUILD_SHARED_LIBS": true,
     "h5fortran_ENABLE_RPATH": true,
-    "h5fortran_find": false
-  }
-},
-{
-  "name": "nofind", "inherits": "reldebug",
-  "binaryDir": "build-nofind",
-  "displayName": "don't find HDF5 or Zlib",
-  "cacheVariables": {
-    "h5fortran_find": false
+    "FETCHCONTENT_TRY_FIND_PACKAGE_MODE": "NEVER"
   }
 },
 {
@@ -56,8 +55,8 @@
 }
 ],
 "buildPresets": [
-  { "name": "default", "configurePreset": "default", "jobs": 0 },
-  { "name": "nofind",  "configurePreset": "nofind", "inherits": "default" },
+  { "name": "default", "configurePreset": "default" },
+  { "name": "build", "configurePreset": "build", "inherits": "default" },
   { "name": "shared",  "configurePreset": "shared", "inherits": "default" },
   {
     "name": "explain",
@@ -74,7 +73,6 @@
     "configurePreset": "default",
     "nativeToolOptions": ["-d", "stats"]
   },
-  { "name": "release","configurePreset": "default" },
   {
     "name": "reldebug",
     "configurePreset": "reldebug",
@@ -100,13 +98,10 @@
     "noTestsAction": "error",
     "scheduleRandom": true,
     "stopOnFailure": false,
-    "jobs": 0,
-    "timeout": 60
+    "jobs": 4
   }
 },
-{ "name": "nofind", "configurePreset": "nofind", "inherits": "default" },
 { "name": "shared", "configurePreset": "shared", "inherits": "default" },
-{ "name": "release", "inherits": "default" },
 {
   "name": "reldebug", "inherits": "default",
   "configurePreset": "reldebug",
@@ -117,6 +112,7 @@
 "workflowPresets": [
   {
     "name": "default",
+    "displayName": "Build and Test in Release mode",
     "steps": [
       { "type": "configure", "name": "default" },
       { "type": "build", "name": "default" },
@@ -124,7 +120,16 @@
     ]
   },
   {
+    "name": "build",
+    "displayName": "Build HDF5 and ZLib from source with h5fortran",
+    "steps": [
+      { "type": "configure", "name": "build" },
+      { "type": "build", "name": "build" }
+    ]
+  },
+  {
     "name": "debug",
+    "displayName": "Build and Test in Debug mode",
     "steps": [
       { "type": "configure", "name": "debug" },
       { "type": "build", "name": "debug" },
@@ -133,6 +138,7 @@
   },
   {
     "name": "reldebug",
+    "displayName": "Build and Test in Release with Debug Info mode",
     "steps": [
       { "type": "configure", "name": "reldebug" },
       { "type": "build", "name": "reldebug" },
@@ -140,27 +146,12 @@
     ]
   },
   {
-    "name": "release",
-    "steps": [
-      { "type": "configure", "name": "default" },
-      { "type": "build", "name": "release" },
-      { "type": "test", "name": "release" }
-    ]
-  },
-  {
     "name": "shared",
+    "displayName": "Build and Test shared libraries",
     "steps": [
       { "type": "configure", "name": "shared" },
       { "type": "build", "name": "shared" },
       { "type": "test", "name": "shared" }
-    ]
-  },
-  {
-    "name": "nofind",
-    "steps": [
-      { "type": "configure", "name": "nofind" },
-      { "type": "build", "name": "nofind" },
-      { "type": "test", "name": "nofind" }
     ]
   }
 ]

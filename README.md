@@ -5,7 +5,6 @@
 
 [![ci](https://github.com/geospace-code/h5fortran/actions/workflows/ci.yml/badge.svg)](https://github.com/geospace-code/h5fortran/actions/workflows/ci.yml)
 [![ci_windows](https://github.com/geospace-code/h5fortran/actions/workflows/ci_windows.yml/badge.svg)](https://github.com/geospace-code/h5fortran/actions/workflows/ci_windows.yml)
-[![ci_build](https://github.com/geospace-code/h5fortran/actions/workflows/ci_build.yml/badge.svg)](https://github.com/geospace-code/h5fortran/actions/workflows/ci_build.yml)
 [![oneapi-linux](https://github.com/geospace-code/h5fortran/actions/workflows/oneapi-linux.yml/badge.svg)](https://github.com/geospace-code/h5fortran/actions/workflows/oneapi-linux.yml)
 [![ci_fpm](https://github.com/geospace-code/h5fortran/actions/workflows/ci_fpm.yml/badge.svg)](https://github.com/geospace-code/h5fortran/actions/workflows/ci_fpm.yml)
 
@@ -106,13 +105,13 @@ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 To not try to find HDF5, instead building HDF5 from source, set:
 
 ```sh
-cmake -B build -Dh5fortran_find=false
+cmake --workflow build
 ```
 
-Optionally, set the version of HDF5 to build with h5fortran_hdf5_req, for example:
+Optionally, set the version of HDF5 to build with h5fortran_hdf5_req (see cmake/libraries.json), for example:
 
 ```sh
-cmake -B build -Dh5fortran_find=false-Dh5fortran_hdf5_req=1.14
+cmake -B build -DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=NEVER -Dh5fortran_hdf5_req=2.1
 ```
 
 see [cmake/libraries.json](./cmake/libraries.json) for supported HDF5 versions.
