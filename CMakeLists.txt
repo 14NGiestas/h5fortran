@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.21...4.3)
+cmake_minimum_required(VERSION 3.24...4.3)
+# CMake >= 3.26 required if building HDF5
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "Please do out of source build like
@@ -7,20 +8,14 @@ endif()
 
 project(h5fortran
 LANGUAGES C Fortran
-VERSION 4.12.0
+VERSION 4.13.0
 )
 # C language is only needed for FindHDF5 algorithms, not for the h5fortran project itself
 
 include(CTest)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
-if(CMAKE_VERSION VERSION_LESS 3.25 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(LINUX true)
-endif()
-
 # --- avoid Anaconda libraries
-if(h5fortran_python)
+if(h5fortran_python AND h5fortran_BUILD_TESTING)
   find_package(Python COMPONENTS Interpreter)
 endif()
 
@@ -40,7 +35,6 @@ if(h5fortran_ENABLE_RPATH AND NOT WIN32)
 endif()
 
 include(cmake/compilers.cmake)
-include(cmake/CheckHDF5.cmake)
 
 set(CMAKE_Fortran_MODULE_DIRECTORY ${h5fortran_BINARY_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
 # HDF5 fetchcontent needs this at least for HDF5 2.0.0, 2.1.0, ...
@@ -50,7 +44,7 @@ include(cmake/hdf5.cmake)
 
 set(HDF5_VERSION ${HDF5_VERSION} CACHE STRING "HDF5 version")
 
-if(h5fortran_IS_TOP_LEVEL AND (hdf5_parallel OR HDF5_HAVE_PARALLEL))
+if(h5fortran_IS_TOP_LEVEL AND (hdf5_parallel OR HDF5_IS_PARALLEL))
   target_link_libraries(HDF5::HDF5 INTERFACE MPI::MPI_Fortran)
 endif()
 
@@ -71,9 +65,7 @@ file(MAKE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY})
 set_property(TARGET h5fortran PROPERTY VERSION ${h5fortran_VERSION})
 
 if(h5fortran_warning_as_error)
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    set_property(TARGET h5fortran PROPERTY COMPILE_WARNING_AS_ERROR true)
-  endif()
+  set_property(TARGET h5fortran PROPERTY COMPILE_WARNING_AS_ERROR true)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 4.0)
     set_property(TARGET h5fortran PROPERTY LINK_WARNING_AS_ERROR true)
   endif()
