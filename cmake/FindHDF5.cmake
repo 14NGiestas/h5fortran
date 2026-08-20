@@ -748,7 +748,7 @@ set(CMAKE_REQUIRED_LIBRARIES ${HDF5_Fortran_LIBRARIES} ${HDF5_C_LIBRARIES})
 # C and C_HL library are always needed for Fortran_HL
 # use HDF5_Fortran_LIBRARIES as it has the stubs if needed
 
-set(CMAKE_REQUIRED_INCLUDES ${ppath} ${HDF5_Fortran_INCLUDE_DIR})
+set(CMAKE_REQUIRED_INCLUDES ${path} ${ppath} ${HDF5_Fortran_INCLUDE_DIR})
 # need HDF5_Fortran_INCLUDE_DIR because with HDF5 2.x, it may be distinct from HDF5_Fortran_HL_INCLUDE_DIR,
 # and the test program needs to include both hdf5.mod and h5lt.mod
 
