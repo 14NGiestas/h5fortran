@@ -11,10 +11,12 @@ include(CheckSourceCompiles)
 if(NOT DEFINED h5fortran_hdf5_req)
   set(h5fortran_hdf5_req "2.2")
 endif()
-# HDF5 2.x requires CMake >= 3.26, but the benefits are so great that this is worthwhile
 
 if(hdf5_parallel)
   set(HDF5_PREFER_PARALLEL ON)
+  if(NOT MPI_Fortran_FOUND)
+    find_package(MPI REQUIRED COMPONENTS C Fortran)
+  endif()
 endif()
 
 file(READ ${CMAKE_CURRENT_LIST_DIR}/libraries.json json)
@@ -51,9 +53,7 @@ if(h5fortran_hdf5_req STREQUAL "2.1patch" OR h5fortran_hdf5_req VERSION_GREATER_
     set(HDF5_ALLOW_EXTERNAL_SUPPORT TGZ)
   endif()
 
-  if(h5fortran_hdf5_zlib)
-    set(HDF5_ENABLE_ZLIB_SUPPORT ON)
-  endif()
+  set(HDF5_ENABLE_ZLIB_SUPPORT ON)
 
   # ZLIB_NG with HDF5 2.2 still has issues at build or link time with symbols.
   set(HDF5_USE_ZLIB_NG OFF)
@@ -110,10 +110,14 @@ endif()
 
 if(NOT TARGET HDF5::HDF5)
 
+  set(_hdf5_parcomps HL Fortran C)
+  if(hdf5_parallel)
+    list(APPEND _hdf5_parcomps parallel)
+  endif()
 if(h5fortran_hdf5_nobuild)
-  find_package(HDF5 REQUIRED COMPONENTS HL Fortran C)
+  find_package(HDF5 REQUIRED COMPONENTS ${_hdf5_parcomps})
 else()
-  FetchContent_Declare(HDF5 URL ${hdf5_url} FIND_PACKAGE_ARGS COMPONENTS HL Fortran C)
+  FetchContent_Declare(HDF5 URL ${hdf5_url} FIND_PACKAGE_ARGS COMPONENTS ${_hdf5_parcomps})
   # "C" as well so that link tests work and corner cases OK
   FetchContent_MakeAvailable(HDF5)
 endif()

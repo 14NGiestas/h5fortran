@@ -153,10 +153,15 @@ if(NOT HDF5_CONFIG_FILE)
   return()
 endif()
 
+# check HDF5 features that require link of external libraries.
+
 # Always check for HDF5 MPI support because HDF5 link fails if MPI is linked into HDF5.
 check_symbol_exists(H5_HAVE_PARALLEL ${HDF5_CONFIG_FILE} HDF5_IS_PARALLEL)
 check_symbol_exists(H5_HAVE_LIBM ${HDF5_CONFIG_FILE} HDF5_HAVE_LIBM)
 check_symbol_exists(H5_HAVE_LIBZ ${HDF5_CONFIG_FILE} HDF5_HAVE_LIBZ)
+check_symbol_exists(H5_HAVE_FILTER_DEFLATE ${HDF5_CONFIG_FILE} HDF5_HAVE_DEFLATE)
+check_symbol_exists(H5_HAVE_FILTER_SZIP ${HDF5_CONFIG_FILE} HDF5_HAVE_SZIP)
+check_symbol_exists(H5_HAVE_PARALLEL_FILTERED_WRITES ${HDF5_CONFIG_FILE} HDF5_HAVE_PARALLEL_FILTERED_WRITES)
 
 set(HDF5_parallel_FOUND false)
 if(HDF5_IS_PARALLEL)
@@ -461,12 +466,13 @@ if(NOT HDF5_C_INCLUDE_DIR)
 endif()
 
 hdf5_detect_config(${HDF5_C_INCLUDE_DIR})
+set(HDF5_parallel_FOUND ${HDF5_parallel_FOUND} PARENT_SCOPE)
 
 if(NOT DEFINED hdf5_support_libs)
   if(HDF5_HAVE_SZIP)
     list(APPEND hdf5_support_libs sz)
   endif()
-  if(HDF5_HAVE_LIBZ)
+  if(HDF5_HAVE_DEFLATE OR HDF5_HAVE_ZLIB)
     list(APPEND hdf5_support_libs z)
   endif()
   if(HDF5_HAVE_LIBM)
